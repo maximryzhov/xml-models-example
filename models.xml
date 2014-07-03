@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <model name="Users" title="Пользователи">
+    <field id="name" type="char" title="Имя" />
+    <field id="paycheck" type="char" title="Зарплата" />
+    <field id="date_joined" type="date" title="Дата присоединения" />
+  </model>
+  <model name="Rooms" title="Комнаты">
+    <field id="department" type="char" title="Отдел" />
+    <field id="spots" type="int" title="Вместительность" />
+  </model>
+  <model name="Inventory" title="Инвентарь">
+    <field id="item" type="char" title="Предмет" />
+    <field id="number" type="int" title="Количество" />
+  </model>
+  <model name="Canteens" title="Столовые">
+    <field id="floor" type="int" title="Этаж" />
+    <field id="number" type="int" title="Количество мест" />
+  </model>
+</root>
