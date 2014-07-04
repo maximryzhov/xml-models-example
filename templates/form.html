@@ -1,6 +1,5 @@
 <form action="/add/{{ model_name }}/" method="post">
 {% csrf_token %}
-<input name="model_name" type="hidden" value="{{ model_name }}">
 {% for hidden in form.hidden_fields %}
    {{ hidden }}
 {% endfor %}
