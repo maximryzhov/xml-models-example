@@ -76,6 +76,7 @@
   padding: 20px;
 }
 
-.error {
+.popover {
+  background-color: #f2dede;
   color: #a94442;
 }

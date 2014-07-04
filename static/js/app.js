@@ -136,11 +136,17 @@ function addObject(event, form) {
             400: function (response) {
             $('#form-wrapper').html(response.responseText);
                 setupModelForm();
+                message = 'Форма заполнена некорректно';
+                renderErrorAlert(message);
             },
-            500: function (response) {
-                renderErrorAlert();
-            },
-        }
+
+        },
+
+        error : function (response) {
+                message = 'Неизвестная ошибка';
+                renderErrorAlert(message);
+            }
+
     });
 }
 
@@ -163,15 +169,16 @@ function updateObject(cell, newValue, modelName) {
         },
 
         statusCode: {
-            400: function (response) {
-                renderErrorPopover(cell.children().first(), response.responseText);
-                
-            },
-            500: function (response) {
-                message = 'Unknown Error';
-                renderErrorPopover(cell.children().first(), message);
+            400: function () {
+                renderErrorPopover(cell.children().first(), 'Недопустимое значение');       
             }
+            
         },
+
+        error: function () {
+            message = 'Неизвестная ошибка';
+            renderErrorPopover(cell.children().first(), message);
+        }
     });
 }
 
@@ -198,11 +205,11 @@ function renderModelForm() {
     formWrapper.html(formHTML);
 }
 
-function renderErrorAlert() {
-    $('form').after('<div id="form-error" class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Unknown error</div>');
+function renderErrorAlert(message) {
+    $('form').after('<div id="form-error" class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+ message + '</div>');
     setTimeout(function() {
     $('#form-error').remove();
-    }, 1000)
+    }, 2000)
 }
 
 function renderErrorPopover (target, message) {

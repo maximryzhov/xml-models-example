@@ -61,8 +61,8 @@ def update_object(request, model_name):
 		m.__dict__.update({field: value}) 
 		try:
 			m.clean_fields()
-		except ValidationError as e:
-			return HttpResponse(json.dumps(e.message_dict[field][0], cls=DjangoJSONEncoder), content_type='application/json', status=400)
+		except ValidationError:
+			return HttpResponse(status=400)
 		m.save(update_fields=[field])
 		return HttpResponse(json.dumps('ok'), content_type='application/json', status=200)
 	else:
