@@ -18,7 +18,7 @@
 	<div id='wrapper'>
 	 <div id='sidebar-wrapper'>
 	    <ul class="sidebar-nav">
-    	<li class="sidebar-brand">Выберите модель<a href="#"></a></li>
+    	<li class="sidebar-brand">Список моделей<a href="#"></a></li>
 	    {% for m in models %}
 	    	<li><a href="" rel="{{ m.name }}" class="menu-item">{{ m.title }}</a></li>
 	    {% endfor %}
@@ -37,7 +37,7 @@
 
 		    <div class="row">
 		            <div class="col-md-12">
-		                <p class="lead">Это приложение на Django загружает модели динамически из XML-файла. Можно добавить новый объект с помощью формы или редактировать существующий, дважды кликнув по соответствующему значению в таблице. Формы для моделей также генерируются динамически штатными средствами Django. Вы можете зайти в <a href="/admin">административный интерфейс</a>. Логин: <strong>admin</strong>, пароль: <strong>pass</strong>. Код приложения доступен на <a href="https://github.com/cruelsoft/xml-models-example">Github</a>.</p>
+		                <p class="lead">Это приложение на Django загружает модели динамически из XML-файла. Можно добавить новый объект с помощью формы или редактировать существующий, дважды кликнув по значению поля в таблице. Формы для моделей также генерируются динамически штатными средствами Django. Код приложения доступен на <a href="https://github.com/cruelsoft/xml-models-example">Github</a>. Чтобы увидеть список объектов, выберите модель из списка слева.</p>
 		                <p class="lead"></p>
 		            </div>
 		    </div>
@@ -53,7 +53,7 @@
 		    </div>
 
 	        <div class="row">
-	        	<div id="form" class="col-md-3">
+	        	<div id="form-wrapper" class="col-md-3">
 	        	</div>
 	        </div>
 

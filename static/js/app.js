@@ -1,64 +1,67 @@
-//Variables for Pure.js template
-var fields = null;
-var titles = null;
-var objects = null;
-var fieldsDir = null;
-var titlesDir = null;
-var objectsDir = null;
+//Global vars
+var modelName = null;
 
-var template = '<thead>' +
-                '<tr>' +
-                '<th class="col-md-4"></th>' +
-                '</tr>' +
-                '</thead>' +
-                '<tbody>' +
-                '<tr>' +
-                '<td></td>' +
-                '</tr>' +
-                '</tbody>';
+var formHTML = null;
+var formWrapper = null;
 
-//Bootstrap datapicker options
-var dtpckr_opts = {
-    todayBtn: 'linked',
-    format: 'yyyy-mm-dd',
-    autoclose: true,
-    language: "ru",
-    todayHighlight: true
+var hiddenDOM = null;
+var targetDOM = null;
+var template = null;
+var dir = {};
+
+var datePickerOptions = null;
+
+//Init functions
+function Init () {
+    initMenuTabs();
+    initTemplate();
+    initDataPicker();
+
+    formWrapper = $('#form-wrapper');
+    hiddenDOM = $('#prepare');
+    targetDOM = $('#result');
+
 }
 
-$(document).ready(function () {
+function initDataPicker() {
+    datePickerOptions = {
+        todayBtn: 'linked',
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        language: "ru",
+        todayHighlight: true
+    }
+}
+
+function initMenuTabs() {
     $('.menu-item').on('click', null, function (event) {
         event.preventDefault();
-        var model_name = $(this).prop('rel');
-        get_model(model_name);
-        get_form(model_name);
-    });
-})
-
-function get_model(model_name) {
-    $.ajax({
-        url: '/get_model/' + model_name,
-        type: "GET",
-        success: function (response) {
-            populate_table(response, model_name);
-        }
+        modelName = $(this).prop('rel');
+        getModelObjects();
+        getModelForm();   
     });
 }
 
-function populate_table(response, model_name) {
-    fields = response['fields'];
-    field_titles = response['field_titles'];
-    field_types = response['field_types'];
-    objects = response['objects'];
+function initTemplate() {
+    template = '<thead>' +
+                    '<tr>' +
+                    '   <th class="col-md-4""></th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                    '<tr>' +
+                        '<td></td>' +
+                    '</tr>' +
+                '</tbody>';
+}
 
-    field_mapping = {};
-    for (var i = 0; i < fields.length; i++) {
-        f = fields[i];
-        field_mapping['td.' + f] = 'object.' + f;
-    };
+function initDirectives(data) {
+modelObjects = data['objects'];
+modelFields = data['fields'];
+fieldTitles = data['field_titles'];
+fieldTypes = data['field_types'];
 
-    ////Directives for Pure.js rendering
-    fieldsDir = {
+    dir['modelFields'] = {
         'td': {
             'field<-': {
                 '@class': 'field',
@@ -73,167 +76,138 @@ function populate_table(response, model_name) {
             }
         }
     };
-    typesDir = {};
-    for (var i = 0; i < fields.length; i++) {
-        f = fields[i];
-        typesDir['td.' + f + '@data-type'] = f;
-    };
-    titlesDir = {
+
+    dir['fieldTitles'] = {
         'th': {
             'title<-': {
                 '.': 'title'
             }
         }
     };
-    objectsDir = {
-        'td@data-pk': 'object.id',
-        'tbody tr': {
-            'object<-': field_mapping
-        }
+
+    dir['fieldTypes'] = {};
+    for (var i = 0; i < modelFields.length; i++) {
+        f = modelFields[i];
+        dir['fieldTypes']['td.' + f + '@data-type'] = f;
     };
 
-    //Rednder table to a hidden element first
-    $('#prepare').html(template).render(fields, fieldsDir).render(field_types, typesDir).render(field_titles, titlesDir).render(objects, objectsDir);
-    $('#result').hide();
-    $('#result').html($('#prepare').html());
-    $('#result').fadeIn(300);
-    setup_table(model_name);
+    fieldMapping = {};
+    for (var i = 0; i < modelFields.length; i++) {
+        f = modelFields[i];
+        fieldMapping['td.' + f] = 'object.' + f;
+    };
+
+    dir['modelObjects'] = {
+        'td@data-pk': 'object.id',
+        'tbody tr': {
+            'object<-': fieldMapping
+        }
+    };
 }
 
-function get_form(model_name) {
+//AJAX functions
+function getModelObjects() {
     $.ajax({
-        url: '/get_form/' + model_name,
+        url: '/get_model/' + modelName,
         type: "GET",
         success: function (response) {
-            $('#form').html(response);
-            setup_form();
+            initDirectives(response);
+            renderTable(dir);
         }
     });
+    
 }
 
-function setup_form() {
-    $('.datepicker.dropdown-menu').remove();
-    var datefield = $('input.datepicker').datepicker(dtpckr_opts);
-
-    $('form input[type=text], input[type=number]').addClass('form-control');
-
-    $('form').on('submit', null, function (event) {
-        event.preventDefault();
-        submit_form(event, $(this));
-    });
-}
-
-function submit_form(event, form) {
-    $.ajax({
+function addObject(event, form) {
+   $.ajax({
         type: 'POST',
         url: form.prop('action'),
         data: form.serialize(),
 
         success: function (response) {
-            objects.push(response);
-            $('#prepare').html(template).render(fields, fieldsDir).render(field_types, typesDir).render(field_titles, titlesDir).render(objects, objectsDir);
-            new_row = $('#prepare tr').last().hide();
-            $('#result').append(new_row);
-            $('#result tr').last().fadeIn(300);
+            modelObjects.push(response);
+            renderTable(dir);
             $('form')[0].reset();
             $('.form-group').removeClass('has-error');
+            setupTable();
         },
 
         statusCode: {
             400: function (response) {
-                $('#form').html(response.responseText);
-                setup_form();
+            $('#form-wrapper').html(response.responseText);
+                setupModelForm();
             },
             500: function (response) {
-                $('form').after('<div id="form-error" class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Unknown error</div>');
-                setTimeout(function() {
-                    $('#form-error').remove();
-                }, 1000)
+                renderErrorAlert();
             },
         }
     });
 }
 
-function setup_table(model_name) {
-    $('#result thead tr').children('th').first().addClass('col-md-1');
-    $('td[editable="true"]').on('dblclick', null, function () {
-
-        var cell = $(this);
-        var old_value = cell.text();
-        var data_type = cell.attr('data-type');
-
-        cell.html('<input type="text" value="' + old_value + '" />');
-
-        //Prevent clearing input with double-click
-        cell.children().first().on('dblclick', null, function (e) {
-            cell.text(old_value);
-        });
-
-        //Date field needs different behaviour because of Datepicker callbacks
-        if (data_type == "DateField") {
-            var datefield = cell.children().first().datepicker(dtpckr_opts).on('hide', function (ev) {
-                var new_value = cell.children().val();
-                if (new_value !== old_value) {
-                    update = update_cell(cell, new_value, model_name);
-                } else {
-                    cell.text(old_value);
-                }
-            }).data('datepicker');
-            cell.children().first().focus();
-        } else {
-            cell.children().first().focus();
-            cell.children().first().keypress(function (e) {
-                if (e.which == 13) {
-                    var new_value = $(this).val();
-                    if (new_value !== old_value) {
-                        update = update_cell(cell, new_value, model_name);
-                    } else {
-                        cell.text(old_value);
-                    }
-                }
-            });
-            cell.children().first().blur(function () {
-                cell.text(old_value);
-            });
-        }
-
-    });
-}
-
-function update_cell(cell, new_value, model_name) {
+function updateObject(cell, newValue, modelName) {
     field = (cell.prop('class'));
     pk = (cell.attr('data-pk'));
     csrf_token = $('form input[name="csrfmiddlewaretoken"]').val();
 
     $.ajax({
-        url: '/update/' + model_name,
+        url: '/update/' + modelName,
         type: "POST",
         data: {
             'pk': pk,
             'field': field,
             csrfmiddlewaretoken: csrf_token,
-            'value': new_value
+            'value': newValue
         },
-        success: function (response) {
-            cell.text(new_value);
+        success: function () {
+            cell.text(newValue);
         },
 
         statusCode: {
             400: function (response) {
-                show_popover(cell.children().first(), response.responseText);
+                renderErrorPopover(cell.children().first(), response.responseText);
+                
             },
             500: function (response) {
                 message = 'Unknown Error';
-                show_popover(cell.children().first(), message);
+                renderErrorPopover(cell.children().first(), message);
             }
         },
     });
-
 }
 
-function show_popover(target, message) {
+function getModelForm() {
+     $.ajax({
+        url: '/get_form/' + modelName,
+        type: "GET",
+        success: function (response) {
+            formHTML = response
+            renderModelForm();
+            setupModelForm();
+        }
+    });   
+}
+
+//Render functions
+function renderTable(dir) {
+    var result = hiddenDOM.html(template).render(modelFields, dir['modelFields']).render(fieldTypes, dir['fieldTypes']).render(fieldTitles, dir['fieldTitles']).render(modelObjects, dir['modelObjects']);
+    targetDOM.html(result.html());
+    setupTable();
+}
+
+function renderModelForm() {
+    formWrapper.html(formHTML);
+}
+
+function renderErrorAlert() {
+    $('form').after('<div id="form-error" class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Unknown error</div>');
+    setTimeout(function() {
+    $('#form-error').remove();
+    }, 1000)
+}
+
+function renderErrorPopover (target, message) {
     target.popover('destroy');
-    error_popover = target.popover({
+    errorPopover = target.popover({
         placement: 'above',
         html: true,
         offset: 80,
@@ -242,3 +216,78 @@ function show_popover(target, message) {
     });
     target.popover('show');
 }
+
+//Setup functions
+function setupModelForm() {
+    $('.datepicker.dropdown-menu').remove();
+    $('input.datepicker').datepicker(datePickerOptions);
+
+    $('#form-wrapper form').find('input[type=text], input[type=number]').addClass('form-control');
+
+    $('#form-wrapper form').on('submit', null, function (event) {
+        event.preventDefault();
+        addObject(event, $(this));
+    });
+}
+
+function setupTable() {
+    targetDOM.find('th').first().addClass('col-md-1');
+    $('td[editable="true"]').on('dblclick', null, function () {
+
+        var cell = $(this);
+        var oldValue = cell.text();
+        var dataType = cell.attr('data-type');
+
+        if (dataType == "IntegerField") {
+            cell.html('<input type="number" value="' + oldValue + '" />');
+            handleCellEditing(cell, oldValue);
+        }
+
+        if (dataType == "CharField") {
+            cell.html('<input type="text" value="' + oldValue + '" />');
+            handleCellEditing(cell, oldValue);
+        }
+
+        if (dataType == "DateField") {
+            cell.html('<input type="text" value="' + oldValue + '" />');
+            var datefield = cell.children().first().datepicker(datePickerOptions).on('hide', function (ev) {
+                var newValue = cell.children().val();
+                if (newValue !== oldValue) {
+                    update = updateObject(cell, newValue, modelName);
+                } else {
+                    cell.text(oldValue);
+                }
+            }).data('datepicker');
+        handleCellEditing(cell, oldValue);            
+        }
+        cell.children().first().focus();
+
+    });
+}
+
+//Handle functions
+function handleCellEditing(cell, oldValue) {
+    cell.children().first().focus();
+    cell.children().first().on('dblclick', null, function (e) {
+        cell.text(oldValue);
+    });
+    cell.children().first().blur(function () {
+        cell.text(oldValue);
+    });
+
+    cell.children().first().keypress(function (e) {
+        if (e.which == 13) {
+            var newValue = $(this).val();
+            if (newValue !== oldValue) {
+                update = updateObject(cell, newValue, modelName);
+            } else {
+                cell.text(oldValue);
+            }
+        }
+    });
+ } 
+
+//finally
+$(document).ready(function () {
+    Init();
+});

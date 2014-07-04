@@ -1,0 +1,4 @@
+xml-models-example
+Django==1.6.5
+lxml==3.3.5
+South==0.8.4
