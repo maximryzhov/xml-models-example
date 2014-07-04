@@ -1,5 +1,21 @@
-<form action="" method="post">
+<form action="/add/{{ model_name }}/" method="post">
 {% csrf_token %}
-{{ form.as_p  }}
+<input name="model_name" type="hidden" value="{{ model_name }}">
+{% for hidden in form.hidden_fields %}
+   {{ hidden }}
+{% endfor %}
+{% for field in form.visible_fields %}
+
+  <div class="form-group{% if field.errors %} has-error{% endif %}">
+    {{ field.label_tag }}
+    {{ field }}
+    {% for err in field.errors %}
+    <span class="control-label">{{ err }}</span>
+    {% endfor %}
+  </div>
+
+{% endfor %}
 <p><input type="submit" value="Добавить" class="btn btn-default" /></p>
+
 </form>
+

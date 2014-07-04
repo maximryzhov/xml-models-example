@@ -2,7 +2,7 @@
 <root>
   <model name="Users" title="Пользователи">
     <field id="name" type="char" title="Имя" />
-    <field id="paycheck" type="char" title="Зарплата" />
+    <field id="paycheck" type="int" title="Зарплата" />
     <field id="date_joined" type="date" title="Дата присоединения" />
   </model>
   <model name="Rooms" title="Комнаты">
