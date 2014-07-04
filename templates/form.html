@@ -3,6 +3,18 @@
 {% for hidden in form.hidden_fields %}
    {{ hidden }}
 {% endfor %}
+
+{% if non_field.errors %}
+<div class="alert alert-danger alert-dismissable">
+<button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+&times;
+</button>
+{% for err in non_field.errors %}
+<strong>Error!</strong> A problem has been occurred while submitting your data.
+{% endfor %}
+</div>
+{% endif %}
+
 {% for field in form.visible_fields %}
 
   <div class="form-group{% if field.errors %} has-error{% endif %}">
@@ -10,7 +22,7 @@
     {{ field }}
     {% for err in field.errors %}
     <span class="control-label">{{ err }}</span>
-    {% endfor %}
+{% endfor %}
   </div>
 
 {% endfor %}

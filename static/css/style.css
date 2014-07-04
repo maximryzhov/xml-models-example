@@ -17,7 +17,7 @@
 
 #page-content-wrapper {
   width: 100%;
-  padding-bottom: 200px;
+  padding-bottom: 400px;
 }
 
 .sidebar-nav {
@@ -74,4 +74,8 @@
 
 .inset {
   padding: 20px;
+}
+
+.error {
+  color: #a94442;
 }
