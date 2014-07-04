@@ -7,6 +7,8 @@ var objectsDir = null;
 
 var template = '<thead><tr><th></th></tr></thead><tbody><tr><td pk=""></td></tr></tbody>';
 
+var dtpckr_opts = {todayBtn: 'linked', format: 'yyyy-mm-dd', autoclose: true, language: "ru", todayHighlight: true}
+
 $(document).ready(function(){	
 	$('.menu-item').on('click', null, function(event){
 		event.preventDefault();
@@ -29,6 +31,7 @@ function get_model(model_name) {
 function populate_table(response, model_name){
 	fields = response['fields'];
 	field_titles = response['field_titles'];
+	field_types = response['field_types'];
 	objects = response['objects'];
 
 	field_mapping = {};
@@ -37,15 +40,16 @@ function populate_table(response, model_name){
 		field_mapping['td.'+ f] = 'object.'+ f;
 	};
 
-	function if_pk (argument) {
-		return 'dfd'
-	}
-
 	fieldsDir = {'td':{'field<-':{'@class':'field'}}};
-	titlesDir = {'th':{'title<-':{'.':'title'}}}
+	typesDir = {};
+	for (var i = 0; i < fields.length; i++) {
+		f = fields[i];
+		typesDir['td.'+ f + '@data-type'] = f;
+	};
+	titlesDir = {'th':{'title<-':{'.':'title'}}};
 	objectsDir = {'td@data-pk':'object.id', 'tbody tr':{'object<-':field_mapping}};
 
-	$('#prepare').html(template).render(fields, fieldsDir).render(field_titles, titlesDir).render(objects, objectsDir);
+	$('#prepare').html(template).render(fields, fieldsDir).render(field_types, typesDir).render(field_titles, titlesDir).render(objects, objectsDir);
 	$('#result').hide();
 	$('#result').html($('#prepare').html());
 	$('#result').fadeIn(300);
@@ -65,9 +69,7 @@ function get_form(model_name) {
 
 function setup_form () {
 	$('.datepicker.dropdown-menu').remove();
-	var datefield = $('input.datepicker').datepicker({format: 'yyyy-mm-dd'}).on('changeDate', function(ev) {
-		datefield.hide();
-	}).data('datepicker');
+	var datefield = $('input.datepicker').datepicker(dtpckr_opts);
 
 	$('form input[type=text], input[type=number]').addClass('form-control');
 	
@@ -85,12 +87,12 @@ function submit_form (event, form) {
         
         success: function(response){
 			objects.push(response);
-			$('#prepare').html(template).render(fields, fieldsDir).render(titles, titlesDir).render(objects, objectsDir);
+			$('#prepare').html(template).render(fields, fieldsDir).render(field_types, typesDir).render(field_titles, titlesDir).render(objects, objectsDir);
 			new_row = $('#prepare tr').last().hide();
 			$('#result').append(new_row);
 			$('#result tr').last().fadeIn(300);
 			$('form')[0].reset();
-			console.log(response);
+			$('.form-group').removeClass('has-error');
         },
         
         statusCode: {
@@ -103,29 +105,47 @@ function submit_form (event, form) {
 }
 
 function setup_table (model_name) {
+	$("thead").children().first().addClass('col-md-1');
     $("td").on('dblclick', function () {
 
         var cell = $(this);
         var old_value = cell.text();
+        var data_type = cell.attr('data-type');
 
         cell.html('<input type="text" value="' + old_value + '" />');
-        cell.children().first().focus();
- 
-        cell.children().first().keypress(function (e) {
-            if (e.which == 13) {
-                var new_value = $(this).val();
-                if (new_value !==  old_value) {
-                	update = update_cell(cell, new_value, model_name);
-                }
-                else {
-                	cell.text(old_value);
-                }
-            }
-        });
- 
-	    $(this).children().first().blur(function(){
-	        cell.text(old_value);
-	    });
+
+        //Date field needs different behaviour because of Datepicker callbacks
+        if (data_type == "DateField") {
+        	var datefield = cell.children().first().datepicker(dtpckr_opts).on('hide', function(ev) {
+        			var new_value = cell.children().val();
+	                if (new_value !==  old_value) {
+	                	update = update_cell(cell, new_value, model_name);
+	                }
+	                else {
+	                	cell.text(old_value);
+	                }
+        		}).data('datepicker');
+        	cell.children().first().focus();
+        }
+        
+        else {
+	        cell.children().first().focus();
+	        cell.children().first().keypress(function (e) {
+	            if (e.which == 13) {
+	                var new_value = $(this).val();
+	                if (new_value !==  old_value) {
+	                	update = update_cell(cell, new_value, model_name);
+	                }
+	                else {
+	                	cell.text(old_value);
+	                }
+	            }
+	        });	 
+		    cell.children().first().blur(function(){
+		        cell.text(old_value);
+		    });
+        }
+
     });
 }
 
@@ -140,7 +160,13 @@ function update_cell (cell, new_value, model_name) {
 	    data: {'pk': pk, 'field': field, csrfmiddlewaretoken: csrf_token,'value': new_value},
 	    success: function(response){
 	    	cell.text(new_value);
-	    }
+	    },
+
+        statusCode: {
+	        400: function(response) {
+	        	console.log(response.responseText);
+	        }
+        }
 	});
 
 }
