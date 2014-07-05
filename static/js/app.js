@@ -37,7 +37,7 @@ function initDatePicker() {
 function initMenuTabs() {
     $('.menu-item').on('click', null, function (event) {
         event.preventDefault();
-        modelName = $(this).prop('rel');
+        modelName = $(this).attr('data-model');
         getModelObjects();
         getModelForm();   
     });
