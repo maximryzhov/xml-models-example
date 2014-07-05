@@ -7,7 +7,6 @@
   </model>
   <model name="Rooms" title="Комнаты">
     <field id="department" type="char" title="Отдел" />
-    <field id="floor" type="char" title="Этаж" />
     <field id="spots" type="int" title="Вместительность" />
   </model>
 </root>
