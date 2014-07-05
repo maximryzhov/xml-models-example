@@ -1,0 +1,45 @@
+[
+{
+    "pk": 1, 
+    "model": "django_xml_models.users", 
+    "fields": {
+        "paycheck": 100, 
+        "name": "\u041f\u0435\u0442\u0440 \u0418\u0432\u0430\u043d\u043e\u0432", 
+        "date_joined": "2014-07-01"
+    }
+},
+{
+    "pk": 2, 
+    "model": "django_xml_models.users", 
+    "fields": {
+        "paycheck": 200, 
+        "name": "\u0418\u0432\u0430\u043d \u041f\u0435\u0442\u0440\u043e\u0432", 
+        "date_joined": "2014-07-05"
+    }
+},
+{
+    "pk": 3, 
+    "model": "django_xml_models.users", 
+    "fields": {
+        "paycheck": 300, 
+        "name": "\u0412\u0430\u0441\u0438\u043b\u0438\u0439 \u0421\u0438\u0434\u043e\u0440\u043e\u0432", 
+        "date_joined": "2014-07-02"
+    }
+},
+{
+    "pk": 1, 
+    "model": "django_xml_models.rooms", 
+    "fields": {
+        "department": "\u0420\u0430\u0437\u0440\u0430\u0431\u043e\u0442\u043a\u0438", 
+        "spots": 100
+    }
+},
+{
+    "pk": 2, 
+    "model": "django_xml_models.rooms", 
+    "fields": {
+        "department": "\u041c\u0430\u0440\u043a\u0435\u0442\u0438\u043d\u0433\u0430", 
+        "spots": 200
+    }
+}
+]

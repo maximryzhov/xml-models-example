@@ -15,7 +15,7 @@ var datePickerOptions = null;
 function Init () {
     initMenuTabs();
     initTemplate();
-    initDataPicker();
+    initDatePicker();
 
     formWrapper = $('#form-wrapper');
     hiddenDOM = $('#prepare');
@@ -23,7 +23,8 @@ function Init () {
 
 }
 
-function initDataPicker() {
+//Set Bootstrap Datepicker options
+function initDatePicker() {
     datePickerOptions = {
         todayBtn: 'linked',
         format: 'yyyy-mm-dd',
@@ -55,6 +56,7 @@ function initTemplate() {
                 '</tbody>';
 }
 
+//Directives for Pure.js library
 function initDirectives(data) {
 modelObjects = data['objects'];
 modelFields = data['fields'];
@@ -227,7 +229,7 @@ function renderErrorPopover (target, message) {
 //Setup functions
 function setupModelForm() {
     $('.datepicker.dropdown-menu').remove();
-    $('input.datepicker').datepicker(datePickerOptions);
+    $('input.date-field').datepicker(datePickerOptions);
 
     $('#form-wrapper form').find('input[type=text], input[type=number]').addClass('form-control');
 

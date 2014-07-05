@@ -14,30 +14,33 @@
 		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/pure.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 	</head>
+
 	<body>
+
 	<div id='wrapper'>
+
 	 <div id='sidebar-wrapper'>
+
 	    <ul class="sidebar-nav">
-    	<li class="sidebar-brand">Список моделей<a href="#"></a></li>
-	    {% for m in models %}
+	    	<li class="sidebar-brand">Список моделей<a href="#"></a></li>
+		    {% for m in models %}
 	    	<li><a href="" rel="{{ m.name }}" class="menu-item">{{ m.title }}</a></li>
-	    {% endfor %}
+		    {% endfor %}
 	    </ul>
+
 	 </div>
 
     <div id="page-content-wrapper">
 
 	    <div class="content-header">
-	        <h1>
-	           Xml Models Example
-	        </h1>
+	        <h1>XML Models Example</h1>
 	    </div>
 
 	    <div class="page-content inset">
 
 		    <div class="row">
 		            <div class="col-md-12">
-		                <p class="lead">Это приложение на Django загружает модели динамически из XML-файла. Можно добавить новый объект с помощью формы или редактировать существующий, дважды кликнув по значению поля в таблице. Формы для моделей также генерируются динамически штатными средствами Django. Код приложения доступен на <a href="https://github.com/cruelsoft/xml-models-example">Github</a>. Чтобы увидеть список объектов, выберите модель из списка слева.</p>
+		                <p class="lead">Это Django-приложение загружает модели динамически из XML-файла, формы для моделей также генерируются динамически. Чтобы увидеть список объектов, выберите модель из перечня слева. Чтобы создать новый объект, добавьте его с помощью формы внизу страницы. Чтобы редактировать существующий объект, дважды кликните по значению поля в таблице. Загружаемые модели также видимы и доступны для редактирования через панель администрирования. Код приложения доступен на <a href="https://github.com/cruelsoft/xml-models-example">Github</a>.</p>
 		                <p class="lead"></p>
 		            </div>
 		    </div>
@@ -45,7 +48,7 @@
 		    <div class="row">
 	        	<div class="col-md-12">
 		        	<table class="hide" id="prepare">
-		        		<!-- invisible table to pre-render -->
+		        		<!-- invisible table for pre-render -->
 		        	</table>
 		        	<table class="table table-bordered table-hover" id="result">
 		        	</table>

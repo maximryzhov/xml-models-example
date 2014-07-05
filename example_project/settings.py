@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
@@ -22,7 +23,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_xml_models',
-    'example_app',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -34,9 +34,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'example_app.urls'
+ROOT_URLCONF = 'example_project.urls'
 
-WSGI_APPLICATION = 'example_app.wsgi.application'
+WSGI_APPLICATION = 'example_project.wsgi.application'
 
 
 DATABASES = {

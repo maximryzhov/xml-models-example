@@ -1,30 +1,31 @@
+# -*- coding: utf-8 -*-
 import json
 
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.db.models import get_model
+from django.db.models import get_model, get_models
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.core.exceptions import ValidationError
 
 from django_xml_models.forms import FormGenerator
-from example_app.models import example_models
+from django_xml_models import models
 
 form_generator = FormGenerator()
 
 def index(request):
-	models = [dict([('name', m.__name__), ('title', m._meta.verbose_name.title())]) for m in example_models]
- 	return render(request, 'index.html', {'models': models})
+	all_models = [dict([('name', m.__name__), ('title', m._meta.verbose_name.title())]) for m in get_models(models)]
+ 	return render(request, 'index.html', {'models': all_models})
 
 def get_dynamic_model(request, model_name):
 	if request.is_ajax():
 		model = get_model('django_xml_models', model_name)
-		obj_query = model.objects.all()
-		objects = [model_to_dict(o) for o in obj_query]
+
+		objects = [model_to_dict(o) for o in model.objects.all()]
 		fields = [f.name for f in model._meta.fields]
-		types = [f.get_internal_type() for f in model._meta.fields]
-		field_types = dict(zip(fields, types))
+		field_types = dict(zip(fields, [f.get_internal_type() for f in model._meta.fields]))
 		field_titles = [f.verbose_name for f in model._meta.fields]
+		
 		result = {'objects': objects, 'fields': fields, 'field_titles': field_titles, 'field_types': field_types}
 		return HttpResponse(json.dumps(result, cls=DjangoJSONEncoder), content_type='application/json', status=200)
 	else:
