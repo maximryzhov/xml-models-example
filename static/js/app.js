@@ -115,9 +115,31 @@ function getModelObjects() {
         success: function (response) {
             initDirectives(response);
             renderTable(dir);
+        },
+
+        error: function() {
+            message = "Ошибка загрузки данных";
+            renderErrorAlert(message);
         }
     });
     
+}
+
+function getModelForm() {
+     $.ajax({
+        url: '/get_form/' + modelName,
+        type: "GET",
+        success: function (response) {
+            formHTML = response
+            renderModelForm();
+            setupModelForm();
+        },
+
+        error: function() {
+            message = "Ошибка загрузки формы";
+            renderErrorAlert(message);
+        }
+    });   
 }
 
 function addObject(event, form) {
@@ -182,18 +204,6 @@ function updateObject(cell, newValue, modelName) {
             renderErrorPopover(cell.children().first(), message);
         }
     });
-}
-
-function getModelForm() {
-     $.ajax({
-        url: '/get_form/' + modelName,
-        type: "GET",
-        success: function (response) {
-            formHTML = response
-            renderModelForm();
-            setupModelForm();
-        }
-    });   
 }
 
 //Render functions
